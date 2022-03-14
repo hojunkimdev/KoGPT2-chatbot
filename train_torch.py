@@ -167,15 +167,17 @@ class KoGPT2Chat(LightningModule):
         optimizer = AdamW(optimizer_grouped_parameters,
                           lr=self.hparams.lr, correct_bias=False)
         # warm up lr
-        num_train_steps = len(self.train_dataloader()) * self.hparams.max_epochs
-        num_warmup_steps = int(num_train_steps * self.hparams.warmup_ratio)
-        scheduler = get_cosine_schedule_with_warmup(
-            optimizer,
-            num_warmup_steps=num_warmup_steps, num_training_steps=num_train_steps)
-        lr_scheduler = {'scheduler': scheduler, 'name': 'cosine_schedule_with_warmup',
-                        'monitor': 'loss', 'interval': 'step',
-                        'frequency': 1}
-        return [optimizer], [lr_scheduler]
+        # num_train_steps = len(self.train_dataloader()) * self.hparams.max_epochs
+        # num_warmup_steps = int(num_train_steps * self.hparams.warmup_ratio)
+        # scheduler = get_cosine_schedule_with_warmup(
+        #     optimizer,
+        #     num_warmup_steps=num_warmup_steps, num_training_steps=num_train_steps)
+        # lr_scheduler = {'scheduler': scheduler, 'name': 'cosine_schedule_with_warmup',
+        #                 'monitor': 'loss', 'interval': 'step',
+        #                 'frequency': 1}
+        # return [optimizer], [lr_scheduler]
+
+        return [optimizer]
 
     def _collate_fn(self, batch):
         data = [item[0] for item in batch]
@@ -229,7 +231,7 @@ if __name__ == "__main__":
             mode='min',
             prefix='model_'
         )
-        # python train_torch.py --train --gpus 1 --max_epochs 3
+        # python train_torch.py --train --gpus 0 --max_epochs 3
         model = KoGPT2Chat(args)
         model.train()
         trainer = Trainer.from_argparse_args(
